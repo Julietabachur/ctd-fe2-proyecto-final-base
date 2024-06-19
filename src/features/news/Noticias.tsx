@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
-import { SuscribeImage, CloseButton as Close } from "../../assets";
 import { obtenerNoticias } from "./fakeRest";
+import { capitalizeTitle, calculateTime } from "./utils";
 import {
-  CloseButton,
-  TarjetaModal,
-  ContenedorModal,
-  DescripcionModal,
-  ImagenModal,
-  TituloModal,
   TarjetaNoticia,
   FechaTarjetaNoticia,
   DescripcionTarjetaNoticia,
@@ -17,9 +11,20 @@ import {
   ListaNoticias,
   TituloNoticias,
   BotonLectura,
-  BotonSuscribir,
-  CotenedorTexto,
 } from "./styled";
+import Modal from "./modal";
+
+/**
+ * Interface para las noticias normalizadas.
+ * @typedef {Object} INoticiasNormalizadas
+ * @property {number} id - El identificador de la noticia.
+ * @property {string} titulo - El título de la noticia.
+ * @property {string} descripcion - La descripción de la noticia.
+ * @property {number|string} fecha - La fecha de la noticia.
+ * @property {boolean} esPremium - Indica si la noticia es premium.
+ * @property {string} imagen - La URL de la imagen de la noticia.
+ * @property {string} [descripcionCorta] - La descripción corta de la noticia.
+ */
 
 export interface INoticiasNormalizadas {
   id: number;
@@ -31,6 +36,22 @@ export interface INoticiasNormalizadas {
   descripcionCorta?: string;
 }
 
+/**
+ * Componente principal de Noticias.
+ * @returns {JSX.Element} El componente Noticias.
+ *
+ * @description
+ * Este componente fue refactorizado para extraer lógica común en funciones utilitarias y componentes separados.
+ *
+ * Refactorizaciones:
+ * - Extracción de funciones utilitarias (`capitalizeTitle` y `calculateTime`).
+ * - Creación del componente `Modal`.
+ *
+ * Principios SOLID aplicados:
+ * - **SRP (Single Responsibility Principle)**: Separación de responsabilidades en funciones utilitarias y el componente `Modal`.
+ * - **OCP (Open/Closed Principle)**: El componente está abierto a la extensión pero cerrado a modificaciones directas.
+ */
+
 const Noticias = () => {
   const [noticias, setNoticias] = useState<INoticiasNormalizadas[]>([]);
   const [modal, setModal] = useState<INoticiasNormalizadas | null>(null);
@@ -40,23 +61,11 @@ const Noticias = () => {
       const respuesta = await obtenerNoticias();
 
       const data = respuesta.map((n) => {
-        const titulo = n.titulo
-          .split(" ")
-          .map((str) => {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-          })
-          .join(" ");
-
-        const ahora = new Date();
-        const minutosTranscurridos = Math.floor(
-          (ahora.getTime() - n.fecha.getTime()) / 60000
-        );
-
         return {
           id: n.id,
-          titulo,
+          titulo: capitalizeTitle(n.titulo),
           descripcion: n.descripcion,
-          fecha: `Hace ${minutosTranscurridos} minutos`,
+          fecha: calculateTime(n.fecha),
           esPremium: n.esPremium,
           imagen: n.imagen,
           descripcionCorta: n.descripcion.substring(0, 100),
@@ -85,46 +94,7 @@ const Noticias = () => {
           </TarjetaNoticia>
         ))}
         {modal ? (
-          modal.esPremium ? (
-            <ContenedorModal>
-              <TarjetaModal>
-                <CloseButton onClick={() => setModal(null)}>
-                  <img src={Close} alt="close-button" />
-                </CloseButton>
-                <ImagenModal src={SuscribeImage} alt="mr-burns-excelent" />
-                <CotenedorTexto>
-                  <TituloModal>Suscríbete a nuestro Newsletter</TituloModal>
-                  <DescripcionModal>
-                    Suscríbete a nuestro newsletter y recibe noticias de
-                    nuestros personajes favoritos.
-                  </DescripcionModal>
-                  <BotonSuscribir
-                    onClick={() =>
-                      setTimeout(() => {
-                        alert("Suscripto!");
-                        setModal(null);
-                      }, 1000)
-                    }
-                  >
-                    Suscríbete
-                  </BotonSuscribir>
-                </CotenedorTexto>
-              </TarjetaModal>
-            </ContenedorModal>
-          ) : (
-            <ContenedorModal>
-              <TarjetaModal>
-                <CloseButton onClick={() => setModal(null)}>
-                  <img src={Close} alt="close-button" />
-                </CloseButton>
-                <ImagenModal src={modal.imagen} alt="news-image" />
-                <CotenedorTexto>
-                  <TituloModal>{modal.titulo}</TituloModal>
-                  <DescripcionModal>{modal.descripcion}</DescripcionModal>
-                </CotenedorTexto>
-              </TarjetaModal>
-            </ContenedorModal>
-          )
+          <Modal modal={modal} closeModal={() => setModal(null)} />
         ) : null}
       </ListaNoticias>
     </ContenedorNoticias>
