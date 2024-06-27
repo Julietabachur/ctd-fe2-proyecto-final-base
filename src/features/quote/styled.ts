@@ -27,6 +27,11 @@ export const ContenedorCita = styled.div`
   box-shadow: 4px 4px 5px darkgrey;
   border-radius: 10px;
   background-color: whitesmoke;
+
+  @media (max-width: 768px) {
+    width: 90%;
+    // min-width: 150px;
+  }
 `;
 
 export const TextoCita = styled.p`
@@ -90,4 +95,9 @@ export const Boton = styled.button<BtnProps>`
             -2px -2px 0 #000000, 2px 0px 0 #000000, 0px 2px 0 #000000,
             -2px 0px 0 #000000, 0px -2px 0 #000000;
         `}
+
+  @media (max-width: 768px) {
+    width: 90%;
+    min-width: 150px;
+  }
 `;

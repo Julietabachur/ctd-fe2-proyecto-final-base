@@ -29,6 +29,18 @@ body {
   height: 100vh;
 }
 
+@media (max-width: 768px) {
+  .App-header {
+    align-items: center;
+  }
+}
+
+@media (max-width: 500px) {
+  .logo {
+    width: 200px;
+  }
+}
+
 .App-bio {
   min-height: 100vh;
   display: flex;

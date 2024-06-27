@@ -44,6 +44,7 @@ export const BioContainer = styled.div`
 export const ContenedorBotones = styled.div`
   display: flex;
   flex-direction: row;
+  flex-flow: wrap;
   justify-content: center;
   align-items: center;
   width: 100%;
